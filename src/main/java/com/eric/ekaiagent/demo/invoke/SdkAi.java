@@ -11,12 +11,22 @@ import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.JsonUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
 
 /**
  * Use DashScope AI SDK
  */
+
+@SpringBootApplication // 关键注解1：标记主配置类
+@Component
 public class SdkAi {
-    public static GenerationResult callWithMessage() throws ApiException, NoApiKeyException, InputRequiredException {
+
+    @Value("${spring.ai.dashscope.api-key}")
+    private String dashScopeApiKey;
+
+    public GenerationResult callWithMessage() throws ApiException, NoApiKeyException, InputRequiredException {
         Generation gen = new Generation();
         Message systemMsg = Message.builder()
                 .role(Role.SYSTEM.getValue())
@@ -28,7 +38,7 @@ public class SdkAi {
                 .build();
         GenerationParam param = GenerationParam.builder()
                 // 若没有配置环境变量，请用百炼API Key将下行替换为：.apiKey("sk-xxx")
-                .apiKey(System.getenv(TestApiKey.API_KEY))
+                .apiKey(System.getenv(dashScopeApiKey))
                 // 此处以qwen-plus为例，可按需更换模型名称。模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
                 .model("qwen-plus")
                 .messages(Arrays.asList(systemMsg, userMsg))
@@ -38,7 +48,8 @@ public class SdkAi {
     }
     public static void main(String[] args) {
         try {
-            GenerationResult result = callWithMessage();
+            SdkAi sdkAi = new SdkAi();
+            GenerationResult result = sdkAi.callWithMessage();
             System.out.println(JsonUtils.toJson(result));
         } catch (ApiException | NoApiKeyException | InputRequiredException e) {
             // 使用日志框架记录异常信息

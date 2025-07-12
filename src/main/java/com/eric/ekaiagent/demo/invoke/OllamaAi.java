@@ -8,21 +8,18 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-/**
- * Use Spring Ai
- */
-//@Slf4j
-//@Component
-public class SpringAi implements CommandLineRunner {
+@Slf4j
+@Component
+public class OllamaAi implements CommandLineRunner {
 
     @Resource
-    private ChatModel dashscopeChatModel;
+    private ChatModel ollamaChatModel;
 
     @Override
     public void run(String... args) throws Exception {
-        AssistantMessage message = dashscopeChatModel.call(new Prompt("说一段诗词"))
+        AssistantMessage output = ollamaChatModel.call(new Prompt("hello "))
                 .getResult()
                 .getOutput();
-        System.out.println(message.getText());
+        System.out.println(output.getText());
     }
 }
