@@ -3,6 +3,8 @@ package com.eric.ekaiagent.app;
 import com.eric.ekaiagent.advisors.MyLoggerAdvisor;
 import com.eric.ekaiagent.advisors.ReReadingAdvisor;
 import com.eric.ekaiagent.chatmemory.FileBasedChatMemory;
+import com.eric.ekaiagent.rag.LoveAppRagCustomAdvisorFactory;
+import com.eric.ekaiagent.rag.QueryRewriter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -34,14 +36,18 @@ public class LoveApp {
             "恋爱状态询问沟通、习惯差异引发的矛盾；已婚状态询问家庭责任与亲属关系处理的问题。" +
             "引导用户详述事情经过、对方反应及自身想法，以便给出专属解决方案。";
 
-    public LoveApp(ChatModel ollamaChatModel) {
+    public LoveApp(ChatModel dashscopeChatModel) {
 
-        // init chat client based on chat memory
+        // init chat client based on file
         String dir = System.getProperty("user.dir") + "/temp/chatmemory";
         ChatMemory chatMemory = new FileBasedChatMemory(dir);
 
-//        ChatMemory chatMemory = new InMemoryChatMemory();
-        chatClient = ChatClient.builder(ollamaChatModel)
+//      ChatMemory chatMemory = new InMemoryChatMemory();
+
+
+
+
+        chatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(chatMemory),
@@ -96,18 +102,36 @@ public class LoveApp {
     @Resource
     private VectorStore pgVectorStore;
 
+    @Resource
+    private QueryRewriter queryRewriter;
+
     public String doChatWithRag(String message, String chatId) {
+
+        // 查询重写
+        String rewrittenMessage = queryRewriter.doQueryRewrite(message);
+
+
         ChatResponse chatResponse = chatClient
                 .prompt()
-                .user(message)
+                .user(rewrittenMessage)
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+
                 // 开启日志，便于观察效果
                 .advisors(new MyLoggerAdvisor())
+
                 // 应用知识库问答
-//                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
+                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
+
                 // use vector store (Base on PgVectorStore)
-                .advisors(new QuestionAnswerAdvisor(pgVectorStore))
+//                .advisors(new QuestionAnswerAdvisor(pgVectorStore))
+
+                // use custom RAG search service
+//                .advisors(
+//                        LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor(
+//                                loveAppVectorStore, "单身"
+//                        )
+//                )
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();
