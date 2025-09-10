@@ -27,12 +27,14 @@ public class LoveAppVectorStoreConfig {
         SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(dashscopeEmbeddingModel)
                 .build();
         // 加载文档
-        List<Document> documents = loveAppDocumentLoader.loadDocuments();
+        List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
         // 自主切分
 //        List<Document> splitDocuments = myTokenTextSplitter.splitCustomized(documents);
 
         // 自动补充关键词元信息
         List<Document> enrichedDocuments = myKeywordEnricher.enrichDocuments(documents);
+
+
         simpleVectorStore.add(enrichedDocuments);
         return simpleVectorStore;
     }

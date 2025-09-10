@@ -1,30 +1,26 @@
 package com.eric.ekaiagent.app;
 
+
 import com.eric.ekaiagent.advisors.MyLoggerAdvisor;
-import com.eric.ekaiagent.advisors.ReReadingAdvisor;
-import com.eric.ekaiagent.chatmemory.FileBasedChatMemory;
-import com.eric.ekaiagent.rag.LoveAppRagCustomAdvisorFactory;
 import com.eric.ekaiagent.rag.QueryRewriter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
-
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
-
-
 @Component
 @Slf4j
 public class LoveApp {
@@ -39,10 +35,13 @@ public class LoveApp {
     public LoveApp(ChatModel dashscopeChatModel) {
 
         // init chat client based on file
-        String dir = System.getProperty("user.dir") + "/temp/chatmemory";
-        ChatMemory chatMemory = new FileBasedChatMemory(dir);
+//        String dir = System.getProperty("user.dir") + "/temp/chatmemory";
+//        ChatMemory chatMemory = new FileBasedChatMemory(dir);
 
-//      ChatMemory chatMemory = new InMemoryChatMemory();
+        MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
+                .chatMemoryRepository(new InMemoryChatMemoryRepository())
+                .maxMessages(20)
+                .build();
 
 
 
@@ -50,7 +49,7 @@ public class LoveApp {
         chatClient = ChatClient.builder(dashscopeChatModel)
                 .defaultSystem(SYSTEM_PROMPT)
                 .defaultAdvisors(
-                        new MessageChatMemoryAdvisor(chatMemory),
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
                         // my logger advisor
                         new MyLoggerAdvisor()
                         // re reading advisor
@@ -69,8 +68,7 @@ public class LoveApp {
         ChatResponse response = chatClient
                 .prompt()
                 .user(message)
-                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
                 .call()
                 .chatResponse();
         String content = response.getResult().getOutput().getText();
@@ -81,14 +79,13 @@ public class LoveApp {
 
     record LoveReport(String title, List<String> suggestions) {}
 
-
     public LoveReport doChatWithReport(String message, String chatId) {
         LoveReport loveReport = chatClient
                 .prompt()
                 .system(SYSTEM_PROMPT + "每次对话后都要生成恋爱结果，标题为{用户名}的恋爱报告，内容为建议列表")
                 .user(message)
-                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId)
+                        .param(ChatMemory.CONVERSATION_ID, 10))
                 .call()
                 .entity(LoveReport.class);
         log.info("loveReport: {}", loveReport);
@@ -105,28 +102,30 @@ public class LoveApp {
     @Resource
     private QueryRewriter queryRewriter;
 
+    /**
+     * 和 RAG 知识库进行对话
+     *
+     * @param message
+     * @param chatId
+     * @return
+     */
     public String doChatWithRag(String message, String chatId) {
-
         // 查询重写
         String rewrittenMessage = queryRewriter.doQueryRewrite(message);
-
-
         ChatResponse chatResponse = chatClient
                 .prompt()
+                // 使用改写后的查询
                 .user(rewrittenMessage)
-                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
-                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
-
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
                 // 开启日志，便于观察效果
                 .advisors(new MyLoggerAdvisor())
-
-                // 应用知识库问答
+                // 应用 RAG 知识库问答
                 .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
-
-                // use vector store (Base on PgVectorStore)
-//                .advisors(new QuestionAnswerAdvisor(pgVectorStore))
-
-                // use custom RAG search service
+                // 应用 RAG 检索增强服务（基于云知识库服务）
+//                .advisors(loveAppRagCloudAdvisor)
+                // 应用 RAG 检索增强服务（基于 PgVector 向量存储）
+//                .advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
+                // 应用自定义的 RAG 检索增强服务（文档查询器 + 上下文增强器）
 //                .advisors(
 //                        LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor(
 //                                loveAppVectorStore, "单身"
@@ -138,4 +137,37 @@ public class LoveApp {
         log.info("content: {}", content);
         return content;
     }
+
+
+
+
+    // AI 调用工具能力
+    @Resource
+    private ToolCallback[] allTools;
+
+
+    /**
+     * AI 恋爱报告功能（支持调用工具）
+     *
+     * @param message
+     * @param chatId
+     * @return
+     */
+    public String doChatWithTools(String message, String chatId) {
+        ChatResponse chatResponse = chatClient
+                .prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                // 开启日志，便于观察效果
+                .advisors(new MyLoggerAdvisor())
+                .toolCallbacks(allTools)
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("content: {}", content);
+        return content;
+    }
+
+
+
 }
