@@ -35,7 +35,7 @@ class LoveAppTest {
     @Test
     void doChatWithReport() {
         String chatId = UUID.randomUUID().toString();
-        String message = "你好, 我是云游,我想让另一半（王子）更爱我";
+        String message = "你好, 我是云游,我想让另一半（公主）更爱我";
         LoveApp.LoveReport loveReport = loveApp.doChatWithReport(message, chatId);
         Assertions.assertNotNull(loveReport);
     }
@@ -46,5 +46,20 @@ class LoveAppTest {
         String message = "我已经结婚了，但是婚后关系不太亲密，怎么办？";
         String answer =  loveApp.doChatWithRag(message, chatId);
         Assertions.assertNotNull(answer);
+    }
+
+
+    private void testMessage(String message) {
+        String chatId = UUID.randomUUID().toString();
+        String answer = loveApp.doChatWithTools(message, chatId);
+        Assertions.assertNotNull(answer);
+    }
+
+    @Test
+    void doChatWithTools() {
+
+        // 测试资源下载：图片下载
+        testMessage("直接下载一张适合做手机壁纸的星空情侣图片为文件");
+
     }
 }
