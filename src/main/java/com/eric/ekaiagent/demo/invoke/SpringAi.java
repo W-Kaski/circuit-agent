@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 /**
  * Use Spring Ai
  */
-//@Slf4j
-//@Component
+
+@Component
 public class SpringAi implements CommandLineRunner {
 
     @Resource
@@ -20,7 +20,7 @@ public class SpringAi implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        AssistantMessage message = dashscopeChatModel.call(new Prompt("说一段诗词"))
+        AssistantMessage message = dashscopeChatModel.call(new Prompt("hi, say one word describe the table"))
                 .getResult()
                 .getOutput();
         System.out.println(message.getText());

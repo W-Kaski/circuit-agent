@@ -24,7 +24,7 @@ public class SdkAi {
                 .build();
         Message userMsg = Message.builder()
                 .role(Role.USER.getValue())
-                .content("解释一下黑洞？")
+                .content("Say Hi")
                 .build();
         GenerationParam param = GenerationParam.builder()
                 // 若没有配置环境变量，请用百炼API Key将下行替换为：.apiKey("sk-xxx")
