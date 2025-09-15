@@ -22,7 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
- * PDF 生成工具（修复版）
+ * PDF generation tool (fixed version)
  */
 public class PDFGenerationTool {
 
@@ -30,71 +30,71 @@ public class PDFGenerationTool {
     public String generatePDF(
             @ToolParam(description = "Name of the file to save the generated PDF") String fileName,
             @ToolParam(description = "Content to be included in the PDF") String content) {
-        
+
         String fileDir = FileConstant.FILE_SAVE_DIR + "/pdf";
         String filePath = fileDir + "/" + (fileName.endsWith(".pdf") ? fileName : fileName + ".pdf");
-        
+
         try {
-            // 创建目录
+            // Create directory
             FileUtil.mkdir(fileDir);
-            
-            // 获取或创建中文字体
+
+            // Get or create Chinese font
             PdfFont chineseFont = getChineseFont();
-            
-            // 创建PDF文档
+
+            // Create PDF document
             try (PdfWriter writer = new PdfWriter(filePath);
-                 PdfDocument pdf = new PdfDocument(writer);
-                 Document document = new Document(pdf, PageSize.A4)) {
-                
-                // 设置文档属性
+                    PdfDocument pdf = new PdfDocument(writer);
+                    Document document = new Document(pdf, PageSize.A4)) {
+
+                // Set document properties
                 document.setMargins(50, 50, 50, 50);
-                
-                // 创建段落并设置字体
+
+                // Create paragraph and set font
                 Paragraph paragraph = new Paragraph(content)
                         .setFont(chineseFont)
                         .setFontSize(12)
                         .setTextAlignment(TextAlignment.LEFT)
-                        .setMultipliedLeading(1.2f); // 行间距
-                
-                // 添加段落
+                        .setMultipliedLeading(1.2f); // Line spacing
+
+                // Add paragraph
                 document.add(paragraph);
             }
-            
+
             return "PDF generated successfully to: " + filePath;
-            
+
         } catch (Exception e) {
             return "Error generating PDF: " + e.getMessage() + ". Please ensure Chinese font files are available.";
         }
     }
-    
+
     /**
-     * 获取中文字体 - 支持多种方案
+     * Get Chinese font - supports multiple solutions
      */
     private PdfFont getChineseFont() throws IOException {
-        // 方案1: 使用系统字体（如果可用）
+        // Solution 1: Use system fonts (if available)
         String[] systemFontPaths = {
-            "C:/Windows/Fonts/simhei.ttf",    // Windows 黑体
-            "C:/Windows/Fonts/simsun.ttf",    // Windows 宋体
-            "/System/Library/Fonts/PingFang.ttc", // macOS
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf" // Linux
+                "C:/Windows/Fonts/simhei.ttf", // Windows SimHei
+                "C:/Windows/Fonts/simsun.ttf", // Windows SimSun
+                "/System/Library/Fonts/PingFang.ttc", // macOS
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf" // Linux
         };
-        
-        // 方案2: 使用资源目录下的字体文件
+
+        // Solution 2: Use font files in the resources directory
         String[] resourceFontPaths = {
-            "static/fonts/simsun.ttf",
-            "fonts/simsun.ttf",
-            "static/fonts/msyh.ttf",    // 微软雅黑
-            "fonts/msyh.ttf"
+                "static/fonts/simsun.ttf",
+                "fonts/simsun.ttf",
+                "static/fonts/msyh.ttf", // Microsoft YaHei
+                "fonts/msyh.ttf"
         };
-        
-        // 首先尝试系统字体
+
+        // Try system fonts first
         for (String fontPath : systemFontPaths) {
             if (Files.exists(Paths.get(fontPath))) {
                 return PdfFontFactory.createFont(fontPath, PdfEncodings.IDENTITY_H);
             }
         }
-        
-        // 然后尝试资源文件中的字体
+
+        // Then try resource font files
         for (String fontPath : resourceFontPaths) {
             try {
                 Resource resource = new ClassPathResource(fontPath);
@@ -102,16 +102,17 @@ public class PDFGenerationTool {
                     return PdfFontFactory.createFont();
                 }
             } catch (Exception e) {
-                // 继续尝试下一个字体
+                // Continue to try the next font
                 continue;
             }
         }
-        
-        // 最后尝试内置字体（作为fallback）
+
+        // Finally, try built-in font as fallback
         try {
             return PdfFontFactory.createFont("STSong-Light", "UniGB-UCS2-H");
         } catch (Exception e) {
-            throw new IOException("No suitable Chinese font found. Please install Chinese fonts or provide font files in resources/fonts/ directory.");
+            throw new IOException(
+                    "No suitable Chinese font found. Please install Chinese fonts or provide font files in resources/fonts/ directory.");
         }
     }
 }

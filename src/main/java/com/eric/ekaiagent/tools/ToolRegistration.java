@@ -15,14 +15,50 @@ public class ToolRegistration {
     private String searchApiKey;
 
     @Bean
-    public ToolCallback[] allTools() {
-        FileOperationTool fileOperationTool = new FileOperationTool();
-        WebSearchTool webSearchTool = new WebSearchTool(searchApiKey);
-        WebScrapingTool webScrapingTool = new WebScrapingTool();
-        ResourceDownloadTool resourceDownloadTool = new ResourceDownloadTool();
-        TerminalOperationTool terminalOperationTool = new TerminalOperationTool();
-        PDFGenerationTool pdfGenerationTool = new PDFGenerationTool();
-        TerminateTool terminateTool = new TerminateTool();
+    public FileOperationTool fileOperationTool() {
+        return new FileOperationTool();
+    }
+
+    @Bean
+    public WebSearchTool webSearchTool() {
+        return new WebSearchTool(searchApiKey);
+    }
+
+    @Bean
+    public WebScrapingTool webScrapingTool() {
+        return new WebScrapingTool();
+    }
+
+    @Bean
+    public ResourceDownloadTool resourceDownloadTool() {
+        return new ResourceDownloadTool();
+    }
+
+    @Bean
+    public TerminalOperationTool terminalOperationTool() {
+        return new TerminalOperationTool();
+    }
+
+    @Bean
+    public PDFGenerationTool pdfGenerationTool() {
+        return new PDFGenerationTool();
+    }
+
+    @Bean
+    public TerminateTool terminateTool() {
+        return new TerminateTool();
+    }
+
+    @Bean
+    public ToolCallback[] allTools(
+            FileOperationTool fileOperationTool,
+            WebSearchTool webSearchTool,
+            WebScrapingTool webScrapingTool,
+            ResourceDownloadTool resourceDownloadTool,
+            TerminalOperationTool terminalOperationTool,
+            PDFGenerationTool pdfGenerationTool,
+            TerminateTool terminateTool) {
+
         return ToolCallbacks.from(
                 fileOperationTool,
                 webSearchTool,
@@ -30,7 +66,6 @@ public class ToolRegistration {
                 resourceDownloadTool,
                 terminalOperationTool,
                 pdfGenerationTool,
-                terminateTool
-        );
+                terminateTool);
     }
 }

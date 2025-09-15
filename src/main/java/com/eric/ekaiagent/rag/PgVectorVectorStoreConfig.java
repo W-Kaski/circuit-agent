@@ -18,21 +18,21 @@ import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgIndexT
 public class PgVectorVectorStoreConfig {
 
     @Resource
-    private LoveAppDocumentLoader loveAppDocumentLoader;
+    private AlgorithmAppDocumentLoader algorithmAppDocumentLoader;
 
     @Bean
     public VectorStore pgVectorVectorStore(JdbcTemplate jdbcTemplate, EmbeddingModel dashscopeEmbeddingModel) {
         VectorStore vectorStore = PgVectorStore.builder(jdbcTemplate, dashscopeEmbeddingModel)
-                .dimensions(1536)                    // Optional: defaults to model dimensions or 1536
-                .distanceType(COSINE_DISTANCE)       // Optional: defaults to COSINE_DISTANCE
-                .indexType(HNSW)                     // Optional: defaults to HNSW
-                .initializeSchema(true)              // Optional: defaults to false
-                .schemaName("public")                // Optional: defaults to "public"
-                .vectorTableName("vector_store")     // Optional: defaults to "vector_store"
-                .maxDocumentBatchSize(10000)         // Optional: defaults to 10000
+                .dimensions(1536) // Optional: defaults to model dimensions or 1536
+                .distanceType(COSINE_DISTANCE) // Optional: defaults to COSINE_DISTANCE
+                .indexType(HNSW) // Optional: defaults to HNSW
+                .initializeSchema(true) // Optional: defaults to false
+                .schemaName("public") // Optional: defaults to "public"
+                .vectorTableName("vector_store") // Optional: defaults to "vector_store"
+                .maxDocumentBatchSize(10000) // Optional: defaults to 10000
                 .build();
         // 加载文档
-        List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
+        List<Document> documents = algorithmAppDocumentLoader.loadMarkdowns();
         vectorStore.add(documents);
         return vectorStore;
     }
