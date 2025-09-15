@@ -14,7 +14,6 @@ public class EkImageSearchMcpServerApplication {
         SpringApplication.run(EkImageSearchMcpServerApplication.class, args);
     }
 
-
     @Bean
     public ToolCallbackProvider imageSearchTools(ImageSearchTool imageSearchTool) {
         return MethodToolCallbackProvider.builder()

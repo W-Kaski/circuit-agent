@@ -144,7 +144,6 @@ public abstract class BaseAgent {
                 }
                 // 正常完成
                 sseEmitter.complete();
-
             } catch (Exception e) {
                 state = AgentState.ERROR;
                 log.error("error executing agent", e);

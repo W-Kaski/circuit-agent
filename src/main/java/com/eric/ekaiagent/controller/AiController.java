@@ -1,7 +1,7 @@
 package com.eric.ekaiagent.controller;
 
 import com.eric.ekaiagent.agent.EkManus;
-import com.eric.ekaiagent.app.LoveApp;
+import com.eric.ekaiagent.app.AlgorithmApp;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequestMapping("/ai")
 public class AiController {
     @Resource
-    private LoveApp loveApp;
+    private AlgorithmApp algorithmApp;
 
     @Resource
     private ToolCallback[] allTools;
@@ -27,64 +27,64 @@ public class AiController {
     @Resource
     private ChatModel dashscopeChatModel;
 
-    @GetMapping("/love_app/chat/sync")
-    public String doChatWithLoveAppSync(String message, String chatId) {
-        return loveApp.doChat(message, chatId);
+    @GetMapping("/algorithm_app/chat/sync")
+    public String doChatWithAlgorithmAppSync(String message, String chatId) {
+        return algorithmApp.doChat(message, chatId);
     }
 
-
     /**
-     * SSE 流式调用 AI 恋爱大师应用
+     * SSE streaming call for Algorithm Master application
      *
      * @param message
      * @param chatId
      * @return
      */
-    @GetMapping(value = "/love_app/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> doChatWithLoveAppSSE(String message, String chatId) {
-        return loveApp.doChatByStream(message, chatId);
+    @GetMapping(value = "/algorithm_app/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> doChatWithAlgorithmAppSSE(String message, String chatId) {
+        return algorithmApp.doChatByStream(message, chatId);
     }
 
-//    /**
-//     * SSE 流式调用 AI 恋爱大师应用
-//     *
-//     * @param message
-//     * @param chatId
-//     * @return
-//     */
-//    @GetMapping(value = "/love_app/chat/server_sent_event")
-//    public Flux<ServerSentEvent<String>> doChatWithLoveAppServerSentEvent(String message, String chatId) {
-//        return loveApp.doChatByStream(message, chatId)
-//                .map(chunk -> ServerSentEvent.<String>builder()
-//                        .data(chunk)
-//                        .build());
-//    }
-//    /**
-//     * SSE 流式调用 AI 恋爱大师应用
-//     *
-//     * @param message
-//     * @param chatId
-//     * @return
-//     */
-//    @GetMapping(value = "/love_app/chat/sse_emitter")
-//    public SseEmitter doChatWithLoveAppServerSseEmitter(String message, String chatId) {
-//        // 创建一个超时时间较长的 SseEmitter
-//        SseEmitter sseEmitter = new SseEmitter(180000L); // 3 分钟超时
-//        // 获取 Flux 响应式数据流并且直接通过订阅推送给 SseEmitter
-//        loveApp.doChatByStream(message, chatId)
-//                .subscribe(chunk -> {
-//                    try {
-//                        sseEmitter.send(chunk);
-//                    } catch (IOException e) {
-//                        sseEmitter.completeWithError(e);
-//                    }
-//                }, sseEmitter::completeWithError, sseEmitter::complete);
-//        // 返回
-//        return sseEmitter;
-//    }
+    /**
+     * SSE streaming call for Algorithm Master application (ServerSentEvent)
+     *
+     * @param message
+     * @param chatId
+     * @return
+     */
+    @GetMapping(value = "/algorithm_app/chat/server_sent_event")
+    public Flux<ServerSentEvent<String>> doChatWithAlgorithmAppServerSentEvent(String message, String chatId) {
+        return algorithmApp.doChatByStream(message, chatId)
+                .map(chunk -> ServerSentEvent.<String>builder()
+                        .data(chunk)
+                        .build());
+    }
 
     /**
-     * 流式调用 Manus 超级智能体
+     * SSE streaming call for Algorithm Master application (SseEmitter)
+     *
+     * @param message
+     * @param chatId
+     * @return
+     */
+    @GetMapping(value = "/algorithm_app/chat/sse_emitter")
+    public SseEmitter doChatWithAlgorithmAppServerSseEmitter(String message, String chatId) {
+        // Create a SseEmitter with a longer timeout (3 minutes)
+        SseEmitter sseEmitter = new SseEmitter(180000L);
+        // Subscribe to the Flux response stream and push to SseEmitter
+        algorithmApp.doChatByStream(message, chatId)
+                .subscribe(chunk -> {
+                    try {
+                        sseEmitter.send(chunk);
+                    } catch (IOException e) {
+                        sseEmitter.completeWithError(e);
+                    }
+                }, sseEmitter::completeWithError, sseEmitter::complete);
+        // Return
+        return sseEmitter;
+    }
+
+    /**
+     * Streaming call for Manus Super Intelligent Agent
      *
      * @param message
      * @return

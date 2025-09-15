@@ -4,7 +4,10 @@ import com.eric.ekaiagent.advisors.MyLoggerAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.stereotype.Component;
 
+
+@Component
 public class EkManus extends ToolCallAgent {
 
     public EkManus(ToolCallback[] allTools, ChatModel dashscopeChatModel) {
