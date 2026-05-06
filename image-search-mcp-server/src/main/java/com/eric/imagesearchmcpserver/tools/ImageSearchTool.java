@@ -1,4 +1,4 @@
-package com.eric.ekimagesearchmcpserver.tools;
+package com.eric.imagesearchmcpserver.tools;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;

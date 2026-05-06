@@ -1,55 +1,41 @@
-# AI智能体应用平台前端
+# Frontend
 
-这是一个基于Vue3开发的AI智能体应用平台，包含两个核心应用：AI恋爱大师和AI超级智能体。
+Vue 3 client for the `circuit-agent` demos.
 
-## 功能特点
+## Responsibilities
 
-- 💬 **AI恋爱大师**：智能情感顾问，为用户提供恋爱相关的建议和解答
-- 🤖 **AI超级智能体**：全能型AI助手，解决各类专业问题
+- render the landing page and chat surfaces
+- connect to backend SSE endpoints
+- separate the algorithm assistant and general agent flows
 
-## 技术栈
+## Runtime
 
-- Vue3
-- Vue Router
-- Axios
-- SSE (Server-Sent Events)
+- Node.js `>= 18`
+- npm `>= 9`
 
-## 开发说明
-
-### 环境要求
-
-- Node.js >= 16.0.0
-- npm >= 7.0.0
-
-### 安装依赖
+## Install
 
 ```bash
 npm install
 ```
 
-### 启动开发服务器
+## Develop
 
 ```bash
 npm run dev
 ```
 
-### 构建项目
+## Build
 
 ```bash
 npm run build
 ```
 
-## 后端接口
+## Backend endpoints
 
-项目依赖以下后端接口：
+- `/api/ai/algorithm_app/chat/sse`
+- `/api/ai/manus/chat`
 
-- `/api/ai/love_app/chat/sse` - AI恋爱大师聊天接口
-- `/api/ai/manus/chat` - AI超级智能体聊天接口
+Default backend origin: `http://localhost:8123`
 
-后端服务默认运行在 `http://localhost:8123`
-
-# Vue 3 + Vite
-
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+Production nginx config assumes the backend is reachable as `backend:8123` on the same network.

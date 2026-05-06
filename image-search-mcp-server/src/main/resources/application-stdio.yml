@@ -2,7 +2,7 @@ spring:
   ai:
     mcp:
       server:
-        name: ek-image-search
+        name: image-search
         version: 0.0.1
         type: SYNC
         # stdio

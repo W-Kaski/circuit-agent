@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ek-image-search
+    name: image-search-mcp-server
   profiles:
     active: sse
 server:

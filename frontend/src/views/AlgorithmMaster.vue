@@ -1,5 +1,5 @@
 <template>
-  <div class="love-master-container">
+  <div class="algorithm-master-container">
     <div class="header">
       <div class="back-button" @click="goBack">Back</div>
       <h1 class="title">AI Algorithm Master</h1>
@@ -11,7 +11,7 @@
         <ChatRoom
             :messages="messages"
             :connection-status="connectionStatus"
-            ai-type="love"
+            ai-type="algorithm"
             @send-message="sendMessage"
         />
       </div>
@@ -29,15 +29,15 @@ import { useRouter } from 'vue-router'
 import { useHead } from '@vueuse/head'
 import ChatRoom from '../components/ChatRoom.vue'
 import AppFooter from '../components/AppFooter.vue'
-import { chatWithLoveApp } from '../api'
+import { chatWithAlgorithmApp } from '../api'
 
 // Set page title and metadata
 useHead({
-  title: 'AI Algorithm Master - EK AI Intelligent Application Platform',
+  title: 'Algorithm Master - Circuit Agent',
   meta: [
     {
       name: 'description',
-      content: 'AI Algorithm Master is a professional advisor on the EK AI Intelligent Application Platform, helping you solve algorithm problems and providing personalized guidance.'
+      content: 'Algorithm Master is the algorithm-focused RAG assistant in Circuit Agent.'
     },
     {
       name: 'keywords',
@@ -56,7 +56,7 @@ let eventSource = null
 
 // 生成随机会话ID
 const generateChatId = () => {
-  return 'love_' + Math.random().toString(36).substring(2, 10)
+  return 'algo_' + Math.random().toString(36).substring(2, 10)
 }
 
 // 添加消息到列表
@@ -71,19 +71,19 @@ const addMessage = (content, isUser) => {
 // 发送消息
 const sendMessage = (message) => {
   addMessage(message, true)
-  
+
   // 连接SSE
   if (eventSource) {
     eventSource.close()
   }
-  
+
   // 创建一个空的AI回复消息
   const aiMessageIndex = messages.value.length
   addMessage('', false)
-  
+
   connectionStatus.value = 'connecting'
-  eventSource = chatWithLoveApp(message, chatId.value)
-  
+  eventSource = chatWithAlgorithmApp(message, chatId.value)
+
   // 监听SSE消息
   eventSource.onmessage = (event) => {
     const data = event.data
@@ -93,13 +93,13 @@ const sendMessage = (message) => {
         messages.value[aiMessageIndex].content += data
       }
     }
-    
+
     if (data === '[DONE]') {
       connectionStatus.value = 'disconnected'
       eventSource.close()
     }
   }
-  
+
   // 监听SSE错误
   eventSource.onerror = (error) => {
     console.error('SSE Error:', error)
@@ -117,7 +117,7 @@ const goBack = () => {
 onMounted(() => {
   // 生成聊天ID
   chatId.value = generateChatId()
-  
+
   // 添加欢迎消息
   addMessage('Welcome to AI Algorithm Master. Please tell me your algorithm question, and I will do my best to provide guidance and advice.', false)
 })
@@ -133,12 +133,12 @@ onBeforeUnmount(() => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-.love-master-container {
+.algorithm-master-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background: #0a0a0a !important;
-  background-image: 
+  background-image:
     radial-gradient(circle at 20% 20%, #1a237e 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, #0d47a1 0%, transparent 50%),
     radial-gradient(circle at 40% 60%, #1565c0 0%, transparent 50%),
@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
   font-weight: 700;
   margin: 0;
   color: #4fc3f7;
-  text-shadow: 
+  text-shadow:
     0 0 8px #4fc3f7,
     0 0 16px #4fc3f7,
     0 2px 4px rgba(0, 0, 0, 0.3);
@@ -255,13 +255,13 @@ onBeforeUnmount(() => {
 
 @keyframes titleGlow {
   0% {
-    text-shadow: 
+    text-shadow:
       0 0 8px #4fc3f7,
       0 0 16px #4fc3f7,
       0 2px 4px rgba(0, 0, 0, 0.3);
   }
   100% {
-    text-shadow: 
+    text-shadow:
       0 0 12px #4fc3f7,
       0 0 20px #4fc3f7,
       0 2px 4px rgba(0, 0, 0, 0.3);
@@ -273,15 +273,15 @@ onBeforeUnmount(() => {
   .header {
     padding: 12px 16px;
   }
-  
+
   .title {
     font-size: 18px;
   }
-  
+
   .chat-id {
     font-size: 12px;
   }
-  
+
   .chat-area {
     padding: 15px;
     min-height: calc(100vh - 48px - 160px);
@@ -294,19 +294,19 @@ onBeforeUnmount(() => {
   .header {
     padding: 10px 12px;
   }
-  
+
   .back-button {
     font-size: 14px;
   }
-  
+
   .title {
     font-size: 16px;
   }
-  
+
   .chat-id {
     display: none;
   }
-  
+
   .chat-area {
     padding: 12px;
     min-height: calc(100vh - 42px - 150px);
@@ -314,4 +314,4 @@ onBeforeUnmount(() => {
     border-radius: 12px;
   }
 }
-</style> 
+</style>

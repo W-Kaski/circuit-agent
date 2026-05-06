@@ -6,17 +6,17 @@ const routes = [
     name: 'Home',
     component: () => import('../views/Home.vue'),
     meta: {
-      title: 'Home - EK AI Intelligent Agent Platform',
-      description: 'EK AI Intelligent Agent Platform provides AI Algorithm Master and AI Super Agent services, meeting all your AI conversation needs.'
+      title: 'Home - Circuit Agent',
+      description: 'Circuit Agent provides an algorithm-focused RAG assistant and a general tool-calling AI agent.'
     }
   },
   {
-    path: '/love-master',
-    name: 'LoveMaster',
+    path: '/algorithm-master',
+    name: 'AlgorithmMaster',
     component: () => import('../views/AlgorithmMaster.vue'),
     meta: {
-      title: 'AI Algorithm Master - EK AI Intelligent Agent Platform',
-      description: 'AI Algorithm Master is the professional algorithm advisor on the EK AI Intelligent Agent Platform, helping you solve algorithm problems and providing algorithm guidance.'
+      title: 'Algorithm Master - Circuit Agent',
+      description: 'Algorithm Master is the RAG-based assistant in Circuit Agent for algorithm and data-structure questions.'
     }
   },
   {
@@ -24,8 +24,8 @@ const routes = [
     name: 'SuperAgent',
     component: () => import('../views/SuperAgent.vue'),
     meta: {
-      title: 'AI Super Agent - EK AI Intelligent Agent Platform',
-      description: 'The AI Super Agent is the all-in-one assistant of the EK AI Intelligent Agent Platform. It can answer a wide range of professional questions and provide accurate advice and tailored solutions.'
+      title: 'Super Agent - Circuit Agent',
+      description: 'Super Agent is the general tool-calling assistant in Circuit Agent for multi-step tasks and professional Q&A.'
     }
   }
 ]
@@ -44,4 +44,4 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-export default router 
+export default router

@@ -44,8 +44,8 @@ export const connectSSE = (url, params, onMessage, onError) => {
   return eventSource
 }
 
-// AI恋爱大师聊天
-export const chatWithLoveApp = (message, chatId) => {
+// Algorithm Master chat
+export const chatWithAlgorithmApp = (message, chatId) => {
   return connectSSE('/ai/algorithm_app/chat/sse', { message, chatId })
 }
 
@@ -55,6 +55,6 @@ export const chatWithManus = (message) => {
 }
 
 export default {
-  chatWithLoveApp,
+  chatWithAlgorithmApp,
   chatWithManus
-} 
+}

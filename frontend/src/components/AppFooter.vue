@@ -3,7 +3,7 @@
     <div class="footer-content">
       <div class="footer-section">
         <div class="footer-logo">
-          <h3>EK AI Intelligent Application Platform</h3>
+          <h3>Circuit Agent</h3>
         </div>
         <div class="footer-links">
           <a href="#">User Agreement</a>
@@ -21,7 +21,7 @@
     </div>
 
     <div class="footer-bottom">
-      <p>© {{ currentYear }} EK AI Intelligent Application Platform - Let AI serve you</p>
+      <p>© {{ currentYear }} Circuit Agent</p>
     </div>
   </footer>
 </template>
@@ -129,7 +129,7 @@ const currentYear = computed(() => new Date().getFullYear())
   .footer-content {
     flex-direction: column;
   }
-  
+
   .footer-section {
     width: 100%;
     margin-bottom: 20px;
@@ -141,18 +141,18 @@ const currentYear = computed(() => new Date().getFullYear())
   .app-footer {
     padding: 30px 0 15px;
   }
-  
+
   .footer-section h4 {
     font-size: 0.95rem;
   }
-  
+
   .footer-links a {
     font-size: 0.9rem;
   }
-  
+
   .qrcode-placeholder {
     width: 80px;
     height: 80px;
   }
 }
-</style> 
+</style>

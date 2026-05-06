@@ -1,10 +1,10 @@
-package com.eric.ekimagesearchmcpserver;
+package com.eric.imagesearchmcpserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EkImageSearchMcpServerApplicationTests {
+class ImageSearchMcpServerApplicationTests {
 
     @Test
     void contextLoads() {

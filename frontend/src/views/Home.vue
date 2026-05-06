@@ -10,8 +10,8 @@
           </div>
           <span class="logo-text">Algorithm Navigation</span>
         </div>
-        
-        
+
+
         <div class="theme-toggle" @click="toggleTheme">
           <span class="theme-icon sun" :class="{ active: !isDarkMode }">☀️</span>
           <span class="theme-icon moon" :class="{ active: isDarkMode }">🌙</span>
@@ -32,7 +32,7 @@
           </p>
 
           <div class="action-buttons">
-            <button class="btn btn-primary" @click="navigateTo('/love-master')">
+            <button class="btn btn-primary" @click="navigateTo('/algorithm-master')">
               AI Algorithm Master
             </button>
             <button class="btn btn-secondary" @click="navigateTo('/super-agent')">
@@ -41,7 +41,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 动态背景元素 -->
       <div class="dynamic-background">
         <!-- 浮动粒子 -->
@@ -55,7 +55,7 @@
           <div class="particle particle-7"></div>
           <div class="particle particle-8"></div>
         </div>
-        
+
         <!-- 几何形状 -->
         <div class="geometric-shapes">
           <div class="shape shape-1"></div>
@@ -64,26 +64,26 @@
           <div class="shape shape-4"></div>
           <div class="shape shape-5"></div>
         </div>
-        
+
         <!-- 代码雨 -->
         <div class="code-rain">
           <div class="code-line" v-for="i in 20" :key="i" :style="{ animationDelay: (i * 0.1) + 's' }">
             {{ getRandomCode() }}
           </div>
         </div>
-        
+
         <!-- 新增：动态网格 -->
         <div class="animated-grid">
           <div class="grid-line" v-for="i in 12" :key="'grid-' + i" :style="{ animationDelay: (i * 0.2) + 's' }"></div>
         </div>
-        
+
         <!-- 新增：脉冲光环 -->
         <div class="pulse-rings">
           <div class="pulse-ring ring-1"></div>
           <div class="pulse-ring ring-2"></div>
           <div class="pulse-ring ring-3"></div>
         </div>
-        
+
         <!-- 新增：动态光线 -->
         <div class="light-rays">
           <div class="light-ray ray-1"></div>
@@ -93,7 +93,7 @@
         </div>
       </div>
     </main>
-    
+
     <AppFooter />
   </div>
 </template>
@@ -106,15 +106,15 @@ import AppFooter from '../components/AppFooter.vue'
 
 // Set page title and metadata
 useHead({
-  title: 'EK AI Intelligent Agent Platform - Home',
+  title: 'Circuit Agent - Home',
   meta: [
     {
       name: 'description',
-      content: 'EK AI Intelligent Agent Platform provides services such as the AI Algorithm Master and AI Super Agent, meeting your diverse needs for AI-powered conversations, intelligent problem-solving, and professional guidance.'
+      content: 'Circuit Agent provides an algorithm-focused RAG assistant and a general tool-calling AI agent.'
     },
     {
       name: 'keywords',
-      content: 'AI Agent, AI Applications, AI Algorithm Master, AI Assistant, Intelligent Conversations, EK, AI Super Agent, Home'
+      content: 'Circuit Agent, AI agent, RAG assistant, algorithm assistant, super agent'
     }
   ]
 })
@@ -130,8 +130,8 @@ const descriptionText = ref('')
 const isTyping = ref(true)
 
 // Original text
-const fullTitle = 'AI Algorithm Super Agent'
-const fullDescription = 'Your all-in-one intelligent companion for algorithms, advanced AI interactions, and problem-solving.'
+const fullTitle = 'Circuit Agent'
+const fullDescription = 'A developer AI playground for algorithm RAG and tool-calling agent workflows.'
 
 
 const navigateTo = (path) => {
@@ -181,7 +181,7 @@ onMounted(async () => {
   // 默认设置为暗色主题
   isDarkMode.value = true
   updateTheme()
-  
+
   // 启动打字机效果
   await nextTick()
   startTypewriterEffect()
@@ -242,7 +242,7 @@ const getRandomCode = () => {
   flex-direction: column;
   min-height: 100vh;
   background: #0a0a0a !important;
-  background-image: 
+  background-image:
     radial-gradient(circle at 20% 20%, #1a237e 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, #0d47a1 0%, transparent 50%),
     radial-gradient(circle at 40% 60%, #1565c0 0%, transparent 50%),
@@ -383,7 +383,7 @@ const getRandomCode = () => {
   color: #4fc3f7;
   line-height: 1.2;
   margin-bottom: 30px;
-  text-shadow: 
+  text-shadow:
     0 0 8px #4fc3f7,
     0 0 16px #4fc3f7,
     0 0 24px #4fc3f7,
@@ -401,14 +401,14 @@ const getRandomCode = () => {
 /* 标题发光动画 */
 @keyframes titleGlow {
   0% {
-    text-shadow: 
+    text-shadow:
       0 0 8px #4fc3f7,
       0 0 16px #4fc3f7,
       0 0 24px #4fc3f7,
       0 4px 20px rgba(0, 0, 0, 0.5);
   }
   100% {
-    text-shadow: 
+    text-shadow:
       0 0 12px #4fc3f7,
       0 0 20px #4fc3f7,
       0 0 28px #4fc3f7,
@@ -720,7 +720,7 @@ const getRandomCode = () => {
   .main-content {
     min-height: calc(100vh - 120px);
   }
-  
+
   .center-content {
     max-width: 90%;
   }
@@ -731,59 +731,59 @@ const getRandomCode = () => {
     padding: 0 15px;
     height: 60px;
   }
-  
-  
+
+
   .main-content {
     padding: 40px 15px;
     min-height: calc(100vh - 100px);
   }
-  
+
   .main-title {
     font-size: 2.5rem;
-    text-shadow: 
+    text-shadow:
       0 0 6px #4fc3f7,
       0 0 12px #4fc3f7,
       0 0 18px #4fc3f7,
       0 2px 15px rgba(0, 0, 0, 0.5);
   }
-  
+
   .main-description {
     font-size: 1.1rem;
     margin-bottom: 40px;
   }
-  
+
   .action-buttons {
     justify-content: center;
   }
-  
+
   .btn {
     font-size: 1rem;
     padding: 14px 28px;
   }
-  
+
   /* 移动端减少动画效果 */
   .particle {
     animation-duration: 12s;
   }
-  
+
   .shape {
     animation-duration: 20s;
   }
-  
+
   .code-line {
     animation-duration: 15s;
   }
-  
+
   /* 移动端简化新增效果 */
   .animated-grid {
     opacity: 0.3;
   }
-  
+
   .pulse-ring {
     animation-duration: 8s;
     opacity: 0.6;
   }
-  
+
   .light-ray {
     animation-duration: 12s;
     opacity: 0.4;
@@ -795,59 +795,59 @@ const getRandomCode = () => {
     padding: 0 10px;
     height: 50px;
   }
-  
+
   .logo-text {
     font-size: 1.2rem;
   }
-  
+
   .main-content {
     padding: 30px 10px;
     min-height: calc(100vh - 80px);
   }
-  
+
   .main-title {
     font-size: 2rem;
-    text-shadow: 
+    text-shadow:
       0 0 4px #4fc3f7,
       0 0 8px #4fc3f7,
       0 0 12px #4fc3f7,
       0 2px 10px rgba(0, 0, 0, 0.5);
   }
-  
+
   .main-description {
     font-size: 1rem;
   }
-  
+
   .btn {
     font-size: 0.9rem;
     padding: 12px 24px;
   }
-  
+
   /* 小屏幕进一步减少动画 */
   .particle {
     animation-duration: 15s;
     opacity: 0.5;
   }
-  
+
   .shape {
     animation-duration: 25s;
     opacity: 0.3;
   }
-  
+
   .code-rain {
     opacity: 0.05;
   }
-  
+
   /* 小屏幕隐藏部分复杂效果 */
   .animated-grid {
     display: none;
   }
-  
+
   .pulse-ring {
     animation-duration: 10s;
     opacity: 0.3;
   }
-  
+
   .light-ray {
     display: none;
   }
@@ -856,7 +856,7 @@ const getRandomCode = () => {
 /* 亮色主题样式 */
 .home-container.light-theme {
   background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-  background-image: 
+  background-image:
     radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
     radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
     url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="1" fill="%23ffffff" opacity="0.3"/></svg>');
@@ -874,7 +874,7 @@ const getRandomCode = () => {
 
 .home-container.light-theme .main-title {
   color: #1976d2 !important;
-  text-shadow: 
+  text-shadow:
     0 0 8px #1976d2,
     0 0 16px #1976d2,
     0 2px 8px rgba(0, 0, 0, 0.3) !important;
@@ -889,13 +889,13 @@ const getRandomCode = () => {
 /* 亮色主题标题发光动画 */
 @keyframes titleGlowLight {
   0% {
-    text-shadow: 
+    text-shadow:
       0 0 8px #1976d2,
       0 0 16px #1976d2,
       0 2px 8px rgba(0, 0, 0, 0.3);
   }
   100% {
-    text-shadow: 
+    text-shadow:
       0 0 12px #1976d2,
       0 0 20px #1976d2,
       0 2px 8px rgba(0, 0, 0, 0.3);
@@ -948,7 +948,7 @@ const getRandomCode = () => {
 /* 暗色主题样式 */
 .home-container.dark-theme {
   background: #0a0a0a !important;
-  background-image: 
+  background-image:
     radial-gradient(circle at 20% 20%, #1a237e 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, #0d47a1 0%, transparent 50%),
     radial-gradient(circle at 40% 60%, #1565c0 0%, transparent 50%),
@@ -966,7 +966,7 @@ const getRandomCode = () => {
 
 .home-container.dark-theme .logo-text {
   color: #ffffff !important;
-  text-shadow: 
+  text-shadow:
     0 0 8px rgba(255, 255, 255, 0.8),
     0 0 16px rgba(255, 255, 255, 0.6),
     0 2px 4px rgba(0, 0, 0, 0.3) !important;
@@ -974,7 +974,7 @@ const getRandomCode = () => {
 
 .home-container.dark-theme .main-title {
   color: #4fc3f7 !important;
-  text-shadow: 
+  text-shadow:
     0 0 8px #4fc3f7,
     0 0 16px #4fc3f7,
     0 0 24px #4fc3f7,
@@ -1169,4 +1169,4 @@ const getRandomCode = () => {
     opacity: 0;
   }
 }
-</style> 
+</style>

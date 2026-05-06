@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.eric</groupId>
-    <artifactId>ek-image-search-mcp-server</artifactId>
+    <artifactId>image-search-mcp-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ek-image-search-mcp-server</name>
-    <description>ek-image-search-mcp-server</description>
+    <name>image-search-mcp-server</name>
+    <description>Image Search MCP Server</description>
     <url/>
     <licenses>
         <license/>

@@ -1,11 +1,9 @@
-package com.eric.ekimagesearchmcpserver.tools;
+package com.eric.imagesearchmcpserver.tools;
 
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class ImageSearchToolTest {
