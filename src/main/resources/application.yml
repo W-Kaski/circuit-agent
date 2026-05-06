@@ -1,6 +1,6 @@
 spring:
   application:
-    name: EK-AI-Agent
+    name: circuit-agent
   profiles:
     active: local
   ai:

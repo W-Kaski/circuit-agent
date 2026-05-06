@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.eric</groupId>
-    <artifactId>EK-AI-Agent</artifactId>
+    <artifactId>circuit-agent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>EK-AI-Agent</name>
-    <description>EK-AI-Agent</description>
+    <name>circuit-agent</name>
+    <description>Circuit Agent</description>
     <url/>
     <licenses>
         <license/>
