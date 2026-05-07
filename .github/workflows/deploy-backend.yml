@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -30,9 +30,10 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          printf '%s' "${{ secrets.SSH_PRIVATE_KEY }}" | perl -0pe 's/\r//g; s/\\n/\n/g' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null
+          ssh-keyscan -H 220.112.207.59 >> ~/.ssh/known_hosts
 
       - name: Deploy to Server
         run: |
@@ -47,10 +48,10 @@ jobs:
 
           echo "Found JAR file: $JAR_FILE"
 
-          ssh -i ~/.ssh/id_ed25519 root@${{ secrets.SERVER_IP }} "mkdir -p ${APP_DIR}"
-          scp -i ~/.ssh/id_ed25519 "$JAR_FILE" root@${{ secrets.SERVER_IP }}:${APP_DIR}/app.jar
+          ssh -i ~/.ssh/id_ed25519 root@220.112.207.59 "mkdir -p ${APP_DIR}"
+          scp -i ~/.ssh/id_ed25519 "$JAR_FILE" root@220.112.207.59:${APP_DIR}/app.jar
 
-          ssh -i ~/.ssh/id_ed25519 root@${{ secrets.SERVER_IP }} "
+          ssh -i ~/.ssh/id_ed25519 root@220.112.207.59 "
             set -e
             cd ${APP_DIR}
 
