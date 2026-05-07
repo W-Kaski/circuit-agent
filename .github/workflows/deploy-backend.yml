@@ -1,0 +1,57 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: |
+          cd backend
+          mvn clean package -DskipTests
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Server
+        run: |
+          # 确保目标文件夹存在
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "mkdir -p /www/wwwroot/EricWang/apps/circuit-agent"
+          
+          # 查找构建好的 jar 包并上传
+          JAR_FILE=$(find backend/target -maxdepth 1 -name "*.jar" ! -name "*original*" ! -name "*sources*" | head -n 1)
+          echo "Found JAR file: $JAR_FILE"
+          scp -i ~/.ssh/id_ed25519 $JAR_FILE ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/www/wwwroot/EricWang/apps/circuit-agent/app.jar
+          
+          # 启动新进程
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
+            cd /www/wwwroot/EricWang/apps/circuit-agent
+            
+            # 杀掉旧进程
+            pkill -f 'circuit-agent/app.jar' || true
+            
+            # 使用服务器上独立的 JDK 17 (宝塔安装的) 后台启动
+            nohup /www/server/java/jdk-17.0.8/bin/java -jar -Xmx512M -Xms256M app.jar > app.log 2>&1 &
+            
+            echo 'Deployment successful! Backend restarted.'
+          "
