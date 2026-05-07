@@ -35,6 +35,24 @@ jobs:
           ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null
           ssh-keyscan -H 220.112.207.59 >> ~/.ssh/known_hosts
 
+      - name: Prepare Runtime Config
+        env:
+          APP_CONFIG_B64: ${{ secrets.APPLICATION_LOCAL_YML_BASE64 }}
+          APP_CONFIG_RAW: ${{ secrets.APPLICATION_LOCAL_YML }}
+        run: |
+          mkdir -p .deploy
+
+          if [ -n "$APP_CONFIG_B64" ]; then
+            printf '%s' "$APP_CONFIG_B64" | tr -d '\r\n' | base64 --decode > .deploy/application-local.yml
+          elif [ -n "$APP_CONFIG_RAW" ]; then
+            printf '%s\n' "$APP_CONFIG_RAW" > .deploy/application-local.yml
+          else
+            echo "Missing GitHub secret: set APPLICATION_LOCAL_YML_BASE64 or APPLICATION_LOCAL_YML."
+            exit 1
+          fi
+
+          test -s .deploy/application-local.yml
+
       - name: Deploy to Server
         run: |
           APP_DIR=/www/wwwroot/EricWang/apps/circuit-agent
@@ -50,13 +68,16 @@ jobs:
 
           ssh -i ~/.ssh/id_ed25519 root@220.112.207.59 "mkdir -p ${APP_DIR}"
           scp -i ~/.ssh/id_ed25519 "$JAR_FILE" root@220.112.207.59:${APP_DIR}/app.jar
+          scp -i ~/.ssh/id_ed25519 .deploy/application-local.yml root@220.112.207.59:${APP_DIR}/application-local.yml
 
           ssh -i ~/.ssh/id_ed25519 root@220.112.207.59 "
             set -e
             cd ${APP_DIR}
 
+            test -s application-local.yml
+            chmod 600 application-local.yml
             fuser -k ${APP_PORT}/tcp || true
-            nohup ${JAVA_BIN} -jar -Xmx512M -Xms256M app.jar > app.log 2>&1 &
+            nohup ${JAVA_BIN} -jar -Xmx512M -Xms256M app.jar --spring.config.additional-location=optional:file:${APP_DIR}/ > app.log 2>&1 &
 
             for attempt in \$(seq 1 20); do
               if curl --silent --fail http://127.0.0.1:${APP_PORT}/api/doc.html >/dev/null; then
