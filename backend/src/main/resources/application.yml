@@ -22,7 +22,7 @@ spring:
 
 
 server:
-  port: 8123
+  port: 8124
   servlet:
     context-path: /api
 
@@ -37,7 +37,7 @@ springdoc:
   group-configs:
     - group: "default"
       paths-to-match: "/**"
-      packages-to-scan: com.eric.ekaiagent.controller
+      packages-to-scan: com.eric.circuitagent.controller
 
 knife4j:
   enable: true

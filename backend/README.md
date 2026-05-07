@@ -11,10 +11,10 @@ Spring Boot service for the `circuit-agent` runtime.
 
 ## Structure
 
-- `src/main/java/com/eric/ekaiagent/app/` — scenario entrypoints
-- `src/main/java/com/eric/ekaiagent/agent/` — agent loop and tool orchestration
-- `src/main/java/com/eric/ekaiagent/rag/` — retrieval pipeline and vector store setup
-- `src/main/java/com/eric/ekaiagent/tools/` — tool implementations
+- `src/main/java/com/eric/circuitagent/app/` — scenario entrypoints
+- `src/main/java/com/eric/circuitagent/agent/` — agent loop and tool orchestration
+- `src/main/java/com/eric/circuitagent/rag/` — retrieval pipeline and vector store setup
+- `src/main/java/com/eric/circuitagent/tools/` — tool implementations
 - `src/main/resources/` — runtime config, documents, and MCP server wiring
 
 ## Run
