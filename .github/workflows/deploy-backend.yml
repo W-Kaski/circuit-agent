@@ -5,6 +5,7 @@ on:
     branches: [ "main", "master" ]
     paths:
       - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
   workflow_dispatch:
 
 jobs:
@@ -14,10 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
 
@@ -35,23 +36,36 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          # 确保目标文件夹存在
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "mkdir -p /www/wwwroot/EricWang/apps/circuit-agent"
-          
-          # 查找构建好的 jar 包并上传
+          APP_DIR=/www/wwwroot/EricWang/apps/circuit-agent
+          APP_PORT=8124
+          JAVA_BIN=/www/server/java/jdk-21.0.2/bin/java
           JAR_FILE=$(find backend/target -maxdepth 1 -name "*.jar" ! -name "*original*" ! -name "*sources*" | head -n 1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "No deployable jar found in backend/target"
+            exit 1
+          fi
+
           echo "Found JAR file: $JAR_FILE"
-          scp -i ~/.ssh/id_ed25519 $JAR_FILE ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/www/wwwroot/EricWang/apps/circuit-agent/app.jar
-          
-          # 启动新进程
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "
-            cd /www/wwwroot/EricWang/apps/circuit-agent
-            
-            # 杀掉旧进程
-            pkill -f 'circuit-agent/app.jar' || true
-            
-            # 使用服务器上独立的 JDK 17 (宝塔安装的) 后台启动
-            nohup /www/server/java/jdk-17.0.8/bin/java -jar -Xmx512M -Xms256M app.jar > app.log 2>&1 &
-            
-            echo 'Deployment successful! Backend restarted.'
+
+          ssh -i ~/.ssh/id_ed25519 root@${{ secrets.SERVER_IP }} "mkdir -p ${APP_DIR}"
+          scp -i ~/.ssh/id_ed25519 "$JAR_FILE" root@${{ secrets.SERVER_IP }}:${APP_DIR}/app.jar
+
+          ssh -i ~/.ssh/id_ed25519 root@${{ secrets.SERVER_IP }} "
+            set -e
+            cd ${APP_DIR}
+
+            pkill -f '${APP_DIR}/app.jar' || true
+            nohup ${JAVA_BIN} -jar -Xmx512M -Xms256M app.jar > app.log 2>&1 &
+
+            for attempt in \$(seq 1 20); do
+              if curl --silent --fail http://127.0.0.1:${APP_PORT}/api/doc.html >/dev/null; then
+                echo 'Deployment successful! Backend restarted and passed health check.'
+                exit 0
+              fi
+              sleep 3
+            done
+
+            echo 'Health check failed. Recent application log:'
+            tail -n 50 app.log || true
+            exit 1
           "
