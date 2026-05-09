@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class ReActAgent extends BaseAgent {
 
+    protected String lastThought = "";
+
     /**
      * 处理当前状态并决定下一步行动
      *
@@ -38,10 +40,12 @@ public abstract class ReActAgent extends BaseAgent {
             // 先思考
             boolean shouldAct = think();
             if (!shouldAct) {
-                return "思考完成 - 无需行动";
+                setState(com.eric.circuitagent.agent.model.AgentState.FINISHED);
+                return lastThought != null && !lastThought.isEmpty() ? lastThought : "无需行动";
             }
             // 再行动
-            return act();
+            String actResult = act();
+            return (lastThought != null && !lastThought.isEmpty() ? lastThought + "\n\n" : "") + actResult;
         } catch (Exception e) {
             // 记录异常日志
             e.printStackTrace();

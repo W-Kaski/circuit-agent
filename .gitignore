@@ -4,3 +4,6 @@
 /backend/target/
 /image-search-mcp-server/target/
 .DS_Store
+.env
+.env.local
+.env.*.local

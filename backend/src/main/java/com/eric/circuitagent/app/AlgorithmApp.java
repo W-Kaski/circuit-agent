@@ -41,25 +41,18 @@ public class AlgorithmApp {
                         +
                         "Please use clear and easy-to-understand language, combined with examples and code, to help users truly understand algorithm knowledge.";
 
-        public AlgorithmApp(ChatModel dashscopeChatModel) {
-
-                // init chat client based on file
-                // String dir = System.getProperty("user.dir") + "/temp/chatmemory";
-                // ChatMemory chatMemory = new FileBasedChatMemory(dir);
-
+        public AlgorithmApp(
+                @org.springframework.beans.factory.annotation.Qualifier("activeChatModel") ChatModel chatModel) {
                 MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
                                 .chatMemoryRepository(new InMemoryChatMemoryRepository())
                                 .maxMessages(20)
                                 .build();
 
-                chatClient = ChatClient.builder(dashscopeChatModel)
+                chatClient = ChatClient.builder(chatModel)
                                 .defaultSystem(SYSTEM_PROMPT)
                                 .defaultAdvisors(
                                                 MessageChatMemoryAdvisor.builder(chatMemory).build(),
-                                                // my logger advisor
                                                 new MyLoggerAdvisor()
-                                // re reading advisor
-                                // new ReReadingAdvisor()
                                 )
                                 .build();
         }
@@ -91,10 +84,12 @@ public class AlgorithmApp {
          * @return Streaming response
          */
         public Flux<String> doChatByStream(String message, String chatId) {
+                String rewrittenMessage = queryRewriter != null ? queryRewriter.doQueryRewrite(message) : message;
                 return chatClient
                                 .prompt()
-                                .user(message)
+                                .user(rewrittenMessage)
                                 .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                                .advisors(new QuestionAnswerAdvisor(algorithmAppVectorStore))
                                 .stream()
                                 .content();
         }

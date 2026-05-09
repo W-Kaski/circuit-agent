@@ -33,28 +33,46 @@ public class AlgorithmAppDocumentLoader {
      * 
      * @return List of parsed Document objects
      */
+    private static final String STORAGE_PATH = "file:storage/documents/";
+
+    /**
+     * Load multiple Markdown documents from both classpath and external storage.
+     * 
+     * @return List of parsed Document objects
+     */
     public List<Document> loadMarkdowns() {
         List<Document> allDocuments = new ArrayList<>();
         try {
-            Resource[] resources = resourcePatternResolver.getResources("classpath:documents/*.md");
-            for (Resource resource : resources) {
-                String filename = resource.getFilename();
-                // Extract the 3rd and 2nd last characters of the filename as a tag (e.g., for
-                // document classification or metadata enrichment)
-                String status = filename.substring(filename.length() - 6, filename.length() - 4);
-                MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
-                        .withHorizontalRuleCreateDocument(true)
-                        .withIncludeCodeBlock(false)
-                        .withIncludeBlockquote(false)
-                        .withAdditionalMetadata("filename", filename)
-                        .withAdditionalMetadata("status", status)
-                        .build();
-                MarkdownDocumentReader markdownDocumentReader = new MarkdownDocumentReader(resource, config);
-                allDocuments.addAll(markdownDocumentReader.get());
-            }
+            // 1. Load from classpath (baked-in docs)
+            Resource[] classpathResources = resourcePatternResolver.getResources("classpath:documents/*.md");
+            loadFromResources(classpathResources, allDocuments);
+
+            // 2. Load from external storage (user uploaded docs)
+            Resource[] externalResources = resourcePatternResolver.getResources(STORAGE_PATH + "*.md");
+            loadFromResources(externalResources, allDocuments);
+            
         } catch (IOException e) {
-            log.error("Failed to load Markdown documents for knowledge ingestion", e);
+            log.error("Failed to load Markdown documents", e);
         }
         return allDocuments;
+    }
+
+    private void loadFromResources(Resource[] resources, List<Document> allDocuments) {
+        if (resources == null) return;
+        for (Resource resource : resources) {
+            try {
+                String filename = resource.getFilename();
+                MarkdownDocumentReaderConfig config = MarkdownDocumentReaderConfig.builder()
+                        .withHorizontalRuleCreateDocument(true)
+                        .withIncludeCodeBlock(true) // Enabled for better technical doc support
+                        .withIncludeBlockquote(true)
+                        .withAdditionalMetadata("filename", filename)
+                        .build();
+                MarkdownDocumentReader reader = new MarkdownDocumentReader(resource, config);
+                allDocuments.addAll(reader.get());
+            } catch (Exception e) {
+                log.warn("Failed to parse document: {}", resource.getFilename());
+            }
+        }
     }
 }

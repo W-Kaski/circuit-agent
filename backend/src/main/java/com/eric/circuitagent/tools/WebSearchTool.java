@@ -39,7 +39,10 @@ public class WebSearchTool {
             JSONObject jsonObject = JSONUtil.parseObj(response);
             // 提取 organic_results 部分
             JSONArray organicResults = jsonObject.getJSONArray("organic_results");
-            List<Object> objects = organicResults.subList(0, 5);
+            if (organicResults == null) {
+                return "Search API failed to return results. Raw response: " + response;
+            }
+            List<Object> objects = organicResults.subList(0, Math.min(5, organicResults.size()));
             // 拼接搜索结果为字符串
             String result = objects.stream().map(obj -> {
                 JSONObject tmpJSONObject = (JSONObject) obj;

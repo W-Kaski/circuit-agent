@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
 /**
  * 抽象基础代理类，用于管理代理状态和执行流程。
  * <p>
@@ -105,12 +106,12 @@ public abstract class BaseAgent {
             // 1、基础校验
             try {
                 if (this.state != AgentState.IDLE) {
-                    sseEmitter.send("错误：无法从状态运行代理：" + this.state);
+                    sseEmitter.send(java.util.Map.of("text", "错误：无法从状态运行代理：" + this.state));
                     sseEmitter.complete();
                     return;
                 }
                 if (StrUtil.isBlank(userPrompt)) {
-                    sseEmitter.send("错误：不能使用空提示词运行代理");
+                    sseEmitter.send(java.util.Map.of("text", "错误：不能使用空提示词运行代理"));
                     sseEmitter.complete();
                     return;
                 }
@@ -131,24 +132,31 @@ public abstract class BaseAgent {
                     log.info("Executing step {}/{}", stepNumber, maxSteps);
                     // 单步执行
                     String stepResult = step();
-                    String result = "Step " + stepNumber + ": " + stepResult;
+                    String result;
+                    if (state == AgentState.FINISHED && !stepResult.startsWith("Tool")) {
+                        result = stepResult;
+                    } else {
+                        result = "Step " + stepNumber + ": " + stepResult;
+                    }
                     results.add(result);
-                    // 输出当前每一步的结果到 SSE
-                    sseEmitter.send(result);
+                    // 输出当前每一步的结果到 SSE (Wrap in JSON to prevent space stripping)
+                    sseEmitter.send(java.util.Map.of("text", result + "\n\n"));
                 }
                 // 检查是否超出步骤限制
                 if (currentStep >= maxSteps) {
                     state = AgentState.FINISHED;
                     results.add("Terminated: Reached max steps (" + maxSteps + ")");
-                    sseEmitter.send("执行结束：达到最大步骤（" + maxSteps + "）");
+                    sseEmitter.send(java.util.Map.of("text", "执行结束：达到最大步骤（" + maxSteps + "）"));
                 }
                 // 正常完成
+                sseEmitter.send("[DONE]");
                 sseEmitter.complete();
             } catch (Exception e) {
                 state = AgentState.ERROR;
                 log.error("error executing agent", e);
                 try {
-                    sseEmitter.send("执行错误：" + e.getMessage());
+                    sseEmitter.send(java.util.Map.of("text", "执行错误：" + e.getMessage()));
+                    sseEmitter.send("[DONE]");
                     sseEmitter.complete();
                 } catch (IOException ex) {
                     sseEmitter.completeWithError(ex);
@@ -187,6 +195,9 @@ public abstract class BaseAgent {
      * 清理资源
      */
     protected void cleanup() {
-        // 子类可以重写此方法来清理资源
+        // Reset state so the agent can be reused for the next question in the same
+        // session
+        this.state = AgentState.IDLE;
+        this.currentStep = 0;
     }
 }

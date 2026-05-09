@@ -84,6 +84,7 @@ public class ToolCallAgent extends ReActAgent {
             List<AssistantMessage.ToolCall> toolCallList = assistantMessage.getToolCalls();
             // Output prompt information
             String result = assistantMessage.getText();
+            this.lastThought = result;
             log.info(getName() + "'s thinking: " + result);
             log.info(getName() + " selected " + toolCallList.size() + " tools to use");
             String toolCallInfo = toolCallList.stream()

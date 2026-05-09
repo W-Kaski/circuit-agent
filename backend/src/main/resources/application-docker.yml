@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/circuit_agent
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always # To ensure pgvector extension is created or tables are ready if needed
+
+# Overriding some defaults for docker environment if necessary
+server:
+  port: 8124
+  servlet:
+    context-path: /api
