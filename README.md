@@ -11,7 +11,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](./LICENSE)
 [![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](./CONTRIBUTING.md)
 
-[中文](./README.zh.md) · [Architecture](#architecture) · [Quickstart](#quickstart) · [Features](#core-capabilities) · [API Docs](#api-documentation)
+[中文](./README.zh.md) · [Architecture](#architecture) · [Quickstart](#quickstart) · [Features](#core-capabilities) · [API Docs](#api-documentation) · [Live Demo](https://www.circuit.anio.me/)
 
 ---
 
@@ -23,6 +23,18 @@
 - **CircuitManus Super Agent** — An autonomous agent based on the `ReAct / ToolCallAgent` execution loop. It self-plans tool invocations, supports built-in tools (web search, scraping, file ops, terminal, PDF generation), and terminates gracefully via a dedicated `TerminateTool`. Session context is persisted across turns via a `sessionId`-keyed agent cache.
 
 The project is designed as a developer experimentation platform, not a production-ready agent framework. Its goal is to explore Java-first AI engineering patterns.
+
+## Live Mode vs Demo Mode
+
+**Live mode** runs the real backend pipeline. It requires PostgreSQL + pgvector,
+a configured DashScope API key, and the Spring Boot backend. In this mode,
+Algorithm Master uses the RAG pipeline and CircuitManus executes the real
+tool-calling agent loop.
+
+**Demo mode** is a frontend-only fallback for UI exploration when the backend is
+unavailable. It simulates streaming responses and mock documents, but it does
+not execute the production RAG pipeline, model calls, tool invocations, or MCP
+integration.
 
 ---
 
@@ -70,31 +82,31 @@ User query
 
 ## Core Capabilities
 
-| Feature | Detail |
-|---------|--------|
-| **RAG over Markdown** | Algorithm and data-structure docs loaded from `resources/documents/`, embedded into PgVector via `AlgorithmAppDocumentLoader` |
-| **Query rewriting** | LLM rewrites user queries before retrieval for improved semantic matching |
-| **Chat memory** | `InMemoryChatMemoryRepository` with 20-message sliding window; `FileBasedChatMemory` available as alternative |
-| **SSE Streaming** | Robust SSE via `SseEmitter` with explicit `[DONE]` termination — prevents browser reconnection loops |
-| **Multi-turn context** | `sessionId`-keyed `CircuitManus` instance cache in `AiController` for persistent cross-turn agent state |
-| **Structured output** | `AlgorithmReport` record via `.entity()` with JSON schema (victools `jsonschema-generator`) |
-| **Tool-calling agent** | `ToolCallAgent` manually manages dispatch via `ToolCallingManager`, bypassing Spring AI auto-invocation |
-| **Built-in tools** | `WebSearchTool`, `WebScrapingTool` (Jsoup + User-Agent), `FileOperationTool`, `ResourceDownloadTool`, `TerminalOperationTool`, `PDFGenerationTool` (iText 9), `TerminateTool` |
-| **MCP integration** | Backend acts as MCP **client** — connects to external MCP servers via SSE or stdio (`mcp-servers.json`) |
-| **MCP sidecar** | `image-search-mcp-server` exposes `ImageSearchTool` (Pexels) as a standalone MCP server in stdio mode |
-| **Multi-model support** | DashScope (default), Ollama (local), LangChain4j DashScope community adapter |
-| **API docs** | Knife4j OpenAPI 3 UI at `http://localhost:48124/api/doc.html` |
+| Feature                 | Detail                                                                                                                                                                        |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **RAG over Markdown**   | Algorithm and data-structure docs loaded from `resources/documents/`, embedded into PgVector via `AlgorithmAppDocumentLoader`                                                 |
+| **Query rewriting**     | LLM rewrites user queries before retrieval for improved semantic matching                                                                                                     |
+| **Chat memory**         | `InMemoryChatMemoryRepository` with 20-message sliding window; `FileBasedChatMemory` available as alternative                                                                 |
+| **SSE Streaming**       | Robust SSE via `SseEmitter` with explicit `[DONE]` termination — prevents browser reconnection loops                                                                          |
+| **Multi-turn context**  | `sessionId`-keyed `CircuitManus` instance cache in `AiController` for persistent cross-turn agent state                                                                       |
+| **Structured output**   | `AlgorithmReport` record via `.entity()` with JSON schema (victools `jsonschema-generator`)                                                                                   |
+| **Tool-calling agent**  | `ToolCallAgent` manually manages dispatch via `ToolCallingManager`, bypassing Spring AI auto-invocation                                                                       |
+| **Built-in tools**      | `WebSearchTool`, `WebScrapingTool` (Jsoup + User-Agent), `FileOperationTool`, `ResourceDownloadTool`, `TerminalOperationTool`, `PDFGenerationTool` (iText 9), `TerminateTool` |
+| **MCP integration**     | Backend acts as MCP **client** — connects to external MCP servers via SSE or stdio (`mcp-servers.json`)                                                                       |
+| **MCP sidecar**         | `image-search-mcp-server` exposes `ImageSearchTool` (Pexels) as a standalone MCP server in stdio mode                                                                         |
+| **Multi-model support** | DashScope (default), Ollama (local), LangChain4j DashScope community adapter                                                                                                  |
+| **API docs**            | Knife4j OpenAPI 3 UI at `http://localhost:48124/api/doc.html`                                                                                                                 |
 
 ### Frontend Highlights (React 19)
 
-| Feature | Detail |
-|---------|--------|
-| **Multi-turn chat UI** | Message history rendered as chat bubbles with auto-scroll; React Strict Mode safe (immutable state updates) |
-| **SSE streaming** | `EventSource`-based streaming with `[DONE]` signal handling and graceful connection teardown |
-| **Auto Demo Mode** | On load, pings the backend. If unreachable, silently enters Demo Mode with simulated streaming and mock responses |
-| **Mode-aware suggestions** | Landing page shows contextual suggested questions that switch between Local RAG and Web/Manus modes |
-| **Offline Library** | Sidebar displays mock algorithm documents with full preview when backend is offline |
-| **Custom SVG Logo** | Wave-in-circle brand icon consistently applied to favicon, landing page, and AI chat avatar |
+| Feature                    | Detail                                                                                                            |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Multi-turn chat UI**     | Message history rendered as chat bubbles with auto-scroll; React Strict Mode safe (immutable state updates)       |
+| **SSE streaming**          | `EventSource`-based streaming with `[DONE]` signal handling and graceful connection teardown                      |
+| **Auto Demo Mode**         | On load, pings the backend. If unreachable, silently enters Demo Mode with simulated streaming and mock responses |
+| **Mode-aware suggestions** | Landing page shows contextual suggested questions that switch between Local RAG and Web/Manus modes               |
+| **Offline Library**        | Sidebar displays mock algorithm documents with full preview when backend is offline                               |
+| **Custom SVG Logo**        | Wave-in-circle brand icon consistently applied to favicon, landing page, and AI chat avatar                       |
 
 ---
 
@@ -147,14 +159,14 @@ circuit-agent/
 
 ### Prerequisites
 
-| Requirement | Version | Notes |
-|-------------|---------|-------|
-| Java | 21+ | Backend and MCP sidecar |
-| Maven (or `./mvnw`) | 3.9+ | Wrapper included |
-| Node.js | 18+ | Frontend |
-| PostgreSQL + pgvector | 14+ | Vector store for RAG |
-| DashScope API Key | — | Alibaba Cloud AI |
-| Pexels API Key | — | MCP sidecar image search (optional) |
+| Requirement           | Version | Notes                               |
+| --------------------- | ------- | ----------------------------------- |
+| Java                  | 21+     | Backend and MCP sidecar             |
+| Maven (or `./mvnw`)   | 3.9+    | Wrapper included                    |
+| Node.js               | 18+     | Frontend                            |
+| PostgreSQL + pgvector | 14+     | Vector store for RAG                |
+| DashScope API Key     | —       | Alibaba Cloud AI                    |
+| Pexels API Key        | —       | MCP sidecar image search (optional) |
 
 ### 1. Backend Configuration
 
@@ -171,7 +183,7 @@ spring:
       api-key: YOUR_DASHSCOPE_API_KEY
 
 search-api:
-  api-key: YOUR_SEARCH_API_KEY    # for WebSearchTool
+  api-key: YOUR_SEARCH_API_KEY # for WebSearchTool
 ```
 
 ### 2. Run Backend
@@ -215,12 +227,12 @@ http://localhost:48124/api/doc.html
 
 Key endpoints:
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/ai/chat/algorithm` | GET | Algorithm Master — SSE streaming (RAG mode) |
-| `/ai/chat/manus` | GET | CircuitManus Agent — SSE step-by-step output |
-| `/knowledge/files` | GET | List uploaded knowledge base documents |
-| `/knowledge/reindex` | POST | Re-index documents into PgVector |
+| Endpoint             | Method | Description                                  |
+| -------------------- | ------ | -------------------------------------------- |
+| `/ai/chat/algorithm` | GET    | Algorithm Master — SSE streaming (RAG mode)  |
+| `/ai/chat/manus`     | GET    | CircuitManus Agent — SSE step-by-step output |
+| `/knowledge/files`   | GET    | List uploaded knowledge base documents       |
+| `/knowledge/reindex` | POST   | Re-index documents into PgVector             |
 
 ---
 
